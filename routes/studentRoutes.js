@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose= require('mongoose');
 const Student = require('../models/student-model.js');
 const { body }= require('express-validator')
 const validateRequest = require('../middlewares/validate-request.js');
@@ -104,6 +105,9 @@ router.put('/api/students/:id',
     async (req, res) => {
         try {
             const {id}= req.params;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).send({ message: "Invalid ID format" });
+            }
             const { firstName, lastName, studentId, courses, email, phone } = req.body;
             const student = await Student.findByIdAndUpdate(id,{ firstName, lastName, studentId, courses, email, phone },{new: true});
             if (!student) {
@@ -121,6 +125,9 @@ router.put('/api/students/:id',
 router.delete('/api/students/:id', async (req, res) => {
     try {
         const {id}= req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ message: "Invalid ID format" });
+        }
         const student = await Student.findByIdAndDelete(id);
         if (!student) {
             return res.status(404).send({ message: "Student not found" });
